@@ -18,8 +18,8 @@ imu = LSM6DS3(ACC_ODR=LSM6DS3.ACC_ODR_6_66_KHZ,
               acc_scale=LSM6DS3.ACC_SCALE_16G,
               gyro_scale=LSM6DS3.GYRO_SCALE_2000DPS)
 
-logFrequency = 100  # Hz
-logCount = 1000
+logFrequency = 500  # Hz
+logCount = 10000
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
     datetime = time.strftime("%Y-%m-%d_%H-%M-%S")
     f = open("logger_output/sensorlog_" + datetime + ".csv", "x")
     # header
-    f.write("time, aquisitionDuration, accX, accY, accZ\n")
+    f.write("time, aquisitionDuration, accX, accY, accZ, gyroX, gyroY, gyroZ\n")
     # the second the file was created
     file_startsecond = time.time()
 
@@ -55,10 +55,12 @@ def main():
             f.write("%.3f,%.6f,%s,%s\n" %
                     (loopsecond, aqTime, accString, gyroString))
 
-            if (i % 10 == 0):
+            # display once every 2 seconds how much data has been logged
+            if (i % (logFrequency * 2) == 0):
                 print("logging: %d of %d" % (i, logCount))
 
             timer.checkpt()
+            
         except KeyboardInterrupt:
             del (imu)
             f.close()
