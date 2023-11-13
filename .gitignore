@@ -1,2 +1,3 @@
 logger_output/*
 __pycache__
+output/*

@@ -19,15 +19,18 @@ imu = LSM6DS3(ACC_ODR=LSM6DS3.ACC_ODR_6_66_KHZ,
               gyro_scale=LSM6DS3.GYRO_SCALE_2000DPS)
 
 logFrequency = 500  # Hz
-logCount = 10000
+logCount = 2000
 
 
 def main():
     global imu
+    global f
 
     # file stup
     datetime = time.strftime("%Y-%m-%d_%H-%M-%S")
-    f = open("logger_output/sensorlog_" + datetime + ".csv", "x")
+    filename = "sensorlog_" + datetime + ".csv"
+    f = open("output/" + filename, "x")
+    print("logging to file:\n" + filename)
     # header
     f.write("time, aquisitionDuration, accX, accY, accZ, gyroX, gyroY, gyroZ\n")
     # the second the file was created
@@ -62,15 +65,23 @@ def main():
             timer.checkpt()
             
         except KeyboardInterrupt:
-            del (imu)
-            f.close()
-            sys.exit(0)
+            cleanup_close()
         except Exception as e:
             print('Caught exception %s' % e)
             traceback.print_exc()
-            del (imu)
-            f.close()
-            sys.exit(0)
+            cleanup_close()
+
+    print("Logging finished")
+    cleanup_close()
+
+
+def cleanup_close():
+    global imu
+    global f
+
+    del (imu)
+    f.close()
+    sys.exit(0)
 
 
 if __name__ == '__main__':
