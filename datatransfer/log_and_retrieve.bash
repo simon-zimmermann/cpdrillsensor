@@ -6,6 +6,6 @@ ssh -t pi@192.168.1.201 "cd /home/pi/cpdrillsensor; python datalogger -c 1000 -f
 # this is the filename of the newly created logfile
 newDatalog=`sed '2q;d' ${pi_shell_log}`
 newDatalog=${newDatalog//[$'\r\n']} 
-echo "Gathering file ${newDatalog}"
 
+echo "Gathering file ${newDatalog}"
 scp pi@192.168.1.201:/home/pi/cpdrillsensor/output/${newDatalog} datalog_current.csv
