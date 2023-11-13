@@ -1,7 +1,7 @@
 import time
 import sys
 import traceback
-from datetime import date
+import argparse
 from oclock import Timer
 
 from lsm6ds3 import LSM6DS3
@@ -18,13 +18,23 @@ imu = LSM6DS3(ACC_ODR=LSM6DS3.ACC_ODR_6_66_KHZ,
               acc_scale=LSM6DS3.ACC_SCALE_16G,
               gyro_scale=LSM6DS3.GYRO_SCALE_2000DPS)
 
-logFrequency = 500  # Hz
-logCount = 2000
-
 
 def main():
     global imu
     global f
+
+    # parse command line arguments
+    parser = argparse.ArgumentParser(prog='datalogger',
+                                     description='Reads data of attached sensors, and writes them to a .csv file. \
+                                     Can only run on a Raspi')
+    parser.add_argument('-c', '--count', type=int, help='How many data points should be logged', default=2000)
+    parser.add_argument('-f', '--frequency', type=int,
+                        help='How many data points should be logged per second', default=500)
+    args = parser.parse_args()
+    print("Logging a total of %d datapoints, with a frequency of %d per second" % (args.count, args.frequency))
+    logFrequency = args.frequency  # Hz
+    logCount = args.count
+
 
     # file stup
     datetime = time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -63,7 +73,7 @@ def main():
                 print("logging: %d of %d" % (i, logCount))
 
             timer.checkpt()
-            
+
         except KeyboardInterrupt:
             cleanup_close()
         except Exception as e:
