@@ -1,5 +1,5 @@
+Logging a total of 1000 datapoints, with a frequency of 500 per second
 logging to file:
-sensorlog_2023-11-08_15-15-06.csv
-logging: 0 of 2000
-logging: 1000 of 2000
+sensorlog_2023-11-13_11-01-24.csv
+logging: 0 of 1000
 Logging finished
