@@ -1,0 +1,16 @@
+close all
+data_raw = readtable("output\datalog_current.csv");
+
+figure()
+plot(data_raw, "time", {'aquisitionDuration'})
+title("aquisitionDuration")
+
+figure()
+stackedplot(data_raw,["accX","accY","accZ"],"XVariable","time")
+title("Acceleration data")
+
+
+data_raw.velY = cumtrapz(data_raw.time,ndata);
+figure()
+plot(data_raw, "time", {'velY'})
+title("velY")
