@@ -3,6 +3,8 @@ Python module for LSM6DS3 IMU made by STMicroelectronics
 
 Programmed by William Harrington
 
+Modified by Simon Zimmermann
+
 wrh2.github.io
 
 Copied from https://github.com/wrh2/LSM6DS3
@@ -82,12 +84,16 @@ class LSM6DS3:
                  acc_int_pin=ACC_INTERRUPT_PIN_INT1,
                  gyro_int_pin=GYRO_INTERRUPT_PIN_INT2,
                  acc_scale=ACC_SCALE_2G,
-                 gyro_scale=GYRO_SCALE_250DPS):
+                 gyro_scale=GYRO_SCALE_250DPS,
+                 pin_SAD_level=0):
 
         self.__name__ = "LSM6DS3"
 
         # device address for LSM6DS3
-        self.DEVICE_ADDRESS = 0x6A
+        # if the pin SAD is tied to VCC, increase slave address by 1
+        # SAD=GND -> DEVICE_ADDRESS=0x6A
+        # SAD=VCC -> DEVICE_ADDRESS=0x6B
+        self.DEVICE_ADDRESS = 0x6A + pin_SAD_level
 
         # linear acceleration sensitivity
         self.acc_sensitivity = .061 * 1e-3 * 9.81  # mg/LSB
