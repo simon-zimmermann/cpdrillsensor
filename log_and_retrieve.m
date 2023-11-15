@@ -1,5 +1,5 @@
 % Execute data aquisition python script on raspi
-shellCommand = 'ssh pi@192.168.1.201 "cd /home/pi/cpdrillsensor; python logger -c 200 -f 500"';
+shellCommand = 'ssh pi@192.168.1.201 "cd /home/pi/cpdrillsensor; python logger -d 10 -f 1000"';
 [~, cmdout] = system(shellCommand);
 
 % get third line of output log
@@ -12,4 +12,4 @@ newDatalogFile = newDatalogFile{3};
 disp("Gathering file " + newDatalogFile)
 shellCommand = sprintf("scp pi@192.168.1.201:/home/pi/cpdrillsensor/output/%s output/%s", newDatalogFile, newDatalogFile);
 [~, cmdout] = system(shellCommand);
-copyfile("output/" + newDatalogFile, "datalog_current.csv")
+copyfile("output/" + newDatalogFile, "output/datalog_current.csv")
