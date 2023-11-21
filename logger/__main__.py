@@ -5,33 +5,27 @@ import argparse
 from oclock import Timer
 from grove.adc import ADC
 from ina219 import INA219
-from ina219 import DeviceRangeError
 from thermistor_utils import SH_converter
 
 from lsm6ds3 import LSM6DS3
 
-# setup for LSM (accelerometer and gyroscope)
-ACC_rate = LSM6DS3.ACC_ODR_104_HZ
-GYRO_rate = LSM6DS3.GYRO_ODR_104_HZ
+# setup for LSM (accelerometer )
+ACC_rate = LSM6DS3.ACC_ODR_26_HZ
 
 lsm1 = LSM6DS3(ACC_ODR=ACC_rate,
-               GYRO_ODR=GYRO_rate,
+               GYRO_ODR=LSM6DS3.GYRO_ODR_POWER_DOWN,
                enable_acc=LSM6DS3.ENABLE_ACC_ALL_AXIS,
-               enable_gyro=LSM6DS3.ENABLE_GYRO_ALL_AXIS,
+               enable_gyro=LSM6DS3.ENABLE_GYRO_NONE_AXIS,
                acc_interrupt=False,
-               gyro_interrupt=False,
-               acc_scale=LSM6DS3.ACC_SCALE_2G,
-               gyro_scale=LSM6DS3.GYRO_SCALE_2000DPS,
+               acc_scale=LSM6DS3.ACC_SCALE_16G,
                pin_SAD_level=0)
 
 lsm2 = LSM6DS3(ACC_ODR=ACC_rate,
-               GYRO_ODR=GYRO_rate,
+               GYRO_ODR=LSM6DS3.GYRO_ODR_POWER_DOWN,
                enable_acc=LSM6DS3.ENABLE_ACC_ALL_AXIS,
-               enable_gyro=LSM6DS3.ENABLE_GYRO_ALL_AXIS,
+               enable_gyro=LSM6DS3.ENABLE_GYRO_NONE_AXIS,
                acc_interrupt=False,
-               gyro_interrupt=False,
-               acc_scale=LSM6DS3.ACC_SCALE_2G,
-               gyro_scale=LSM6DS3.GYRO_SCALE_2000DPS,
+               acc_scale=LSM6DS3.ACC_SCALE_16G,
                pin_SAD_level=1)
 
 
@@ -44,7 +38,7 @@ def main():
                                      Can only run on a Raspi')
     parser.add_argument('-d', '--duration', type=int, help='Logging duration in seconds', default=2)
     parser.add_argument('-f', '--frequency', type=int,
-                        help='How many data points should be logged per second', default=104)
+                        help='How many data points should be logged per second', default=26)
     args = parser.parse_args()
     print("Logging for a total of %d seconds, with a frequency of %d per second" % (args.duration, args.frequency))
     logFrequency = args.frequency  # Hz
@@ -56,9 +50,9 @@ def main():
     # amp meter (see https://pypi.org/project/pi-ina219/)
     SHUNT_OHMS = 0.1
     ampMeter1 = INA219(SHUNT_OHMS, address=0x40)
-    ampMeter1.configure()
+    ampMeter1.configure(voltage_range=INA219.RANGE_32V)
     ampMeter2 = INA219(SHUNT_OHMS, address=0x41)
-    ampMeter2.configure()
+    ampMeter2.configure(voltage_range=INA219.RANGE_32V)
 
     # file stup
     datetime = time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -66,11 +60,9 @@ def main():
     f = open("output/" + filename, "x")
     print("logging to file:\n" + filename)
     # header
-    f.write("time, aquisitionDuration, \
+    f.write("time, aquisitionDuration, remainingTime, \
             imu1_accX, imu1_accY, imu1_accZ, \
-            imu1_gyroX, imu1_gyroY, imu1_gyroZ, \
             imu2_accX, imu2_accY, imu2_accZ, \
-            imu2_gyroX, imu2_gyroY, imu2_gyroZ,\
             temp0, temp1,temp2,temp3, \
             power1Volt, power1MilliAmp, power1MilliWatt, power1ShuntMilliVolt,\
             power2Volt, power2MilliAmp, power2MilliWatt, power2ShuntMilliVolt\n")
@@ -97,37 +89,29 @@ def main():
         # how many seconds have passed since the file was created
         loopsecond = time.time() - file_startsecond
         try:
-            # get acc/gyro sensor data
+            # get acc sensor data
             accData1 = lsm1.getAccData()
             accString1 = "%.6f,%.6f,%.6f" % (accData1[0], accData1[1], accData1[2])
-            gyroData1 = lsm1.getGyroData()
-            gyroString1 = "%.6f,%.6f,%.6f" % (gyroData1[0], gyroData1[1], gyroData1[2])
             accData2 = lsm2.getAccData()
             accString2 = "%.6f,%.6f,%.6f" % (accData2[0], accData2[1], accData2[2])
-            gyroData2 = lsm2.getGyroData()
-            gyroString2 = "%.6f,%.6f,%.6f" % (gyroData2[0], gyroData2[1], gyroData2[2])
 
             # get temperature  resistance value
             # 10kOhm NTC probe; 10kOhm resistor as voltage divider
-            # Vntc = Vcc * Rntc / (Rntc + 10kOhm)
-            # Vread = Vntc / Vcc
-            # Vread = Rntc / (Rntc + 10kOhm)
-            # Rntc = Vread * 10kOhm / (1 - Vread)
-            #TODO MATH MY BE WRONG!
-            vread0 = adc.read(0)
-            vread1 = adc.read(1)
-            vread2 = adc.read(2)
-            vread3 = adc.read(3)
-            rntc0 = vread0 * 10000 / (1 - vread0)
-            rntc1 = vread1 * 10000 / (1 - vread1)
-            rntc2 = vread2 * 10000 / (1 - vread2)
-            rntc3 = vread3 * 10000 / (1 - vread3)
-            temp0 = conv.temperature(-rntc0)
-            temp1 = conv.temperature(-rntc1)
-            temp2 = conv.temperature(-rntc2)
-            temp3 = conv.temperature(-rntc3)
+            # rntc = (10000 * uread) / (uref - uread)
+            uref = adc.read_voltage(9)  # ADC supply voltage
+            uread0 = adc.read_voltage(0)  # ADC reading
+            uread1 = adc.read_voltage(1)
+            uread2 = adc.read_voltage(2)
+            uread3 = adc.read_voltage(3)
+            rntc0 = (10000 * uread0) / (uref - uread0)
+            rntc1 = (10000 * uread1) / (uref - uread1)
+            rntc2 = (10000 * uread2) / (uref - uread2)
+            rntc3 = (10000 * uread3) / (uref - uread3)
+            temp0 = conv.temperature(rntc0)
+            temp1 = conv.temperature(rntc1)
+            temp2 = conv.temperature(rntc2)
+            temp3 = conv.temperature(rntc3)
 
-            #tempString = "%.1f,%.1f,%.1f,%.1f" % (rntc0, rntc1, rntc2, rntc3)
             tempString = "%.1f,%.1f,%.1f,%.1f" % (temp0, temp1, temp2, temp3)
 
             # get power meter
@@ -138,10 +122,16 @@ def main():
 
             # Duration the data aquisition took
             aqTime = time.perf_counter() - startTime
+            # Time remaining before next loop
+            remainingTime = (1 / logFrequency) - aqTime
 
             # Write data to file
-            f.write("%.3f,%.6f,%s,%s,%s,%s,%s,%s,%s\n" %
-                    (loopsecond, aqTime, accString1, gyroString1, accString2, gyroString2, tempString, powerString1, powerString2))
+            f.write("%.3f,%.6f,%.6f,%s,%s,%s,%s,%s\n" %
+                    (loopsecond, aqTime, remainingTime,
+                     accString1,
+                     accString2,
+                     tempString,
+                     powerString1, powerString2))
 
             # display once every 2 seconds how much data has been logged
             logCount = logCount + 1
