@@ -2,8 +2,8 @@ close all
 data_raw = readtable("output\datalog_current.csv");
 
 figure()
-plot(data_raw, "time", {'aquisitionDuration'})
-title("aquisitionDuration")
+plot(data_raw, "time", {'aquisitionDuration', 'remainingTime'})
+title("aquisitionDuration, remainingTime")
 
 figure()
 stackedplot(data_raw,["imu1_accX","imu1_accY","imu1_accZ"],"XVariable","time")
