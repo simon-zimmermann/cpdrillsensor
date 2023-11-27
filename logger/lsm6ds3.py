@@ -1,13 +1,10 @@
 """
 Python module for LSM6DS3 IMU made by STMicroelectronics
 
-Programmed by William Harrington
+Programmed by William Harrington wrh2.github.io https://github.com/wrh2/LSM6DS3
 
 Modified by Simon Zimmermann
 
-wrh2.github.io
-
-Copied from https://github.com/wrh2/LSM6DS3
 """
 import smbus2
 from ctypes import c_int16
