@@ -9,7 +9,7 @@ from thermistor_utils import SH_converter
 
 from lsm6ds3 import LSM6DS3
 
-# setup for LSM (accelerometer )
+# setup for LSM (accelerometer)
 ACC_rate = LSM6DS3.ACC_ODR_26_HZ
 
 lsm1 = LSM6DS3(ACC_ODR=ACC_rate,
