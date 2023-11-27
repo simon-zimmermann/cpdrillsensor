@@ -1,5 +1,5 @@
 close all
-data_raw = readtable("output\datalog_current.csv");
+data_raw = readtable("datalog_current.csv");
 
 figure()
 plot(data_raw, "time", {'aquisitionDuration', 'remainingTime'})

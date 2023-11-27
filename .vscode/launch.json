@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "Deploy",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/deploy_logger.ps1",
+            "cwd": "${cwd}"
+        },
+        {
+            "name": "Cleanup",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/cleanup.ps1",
+            "cwd": "${cwd}"
+        }
+    ]
+}

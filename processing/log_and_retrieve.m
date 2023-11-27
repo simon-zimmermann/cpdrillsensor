@@ -11,6 +11,6 @@ newDatalogFile = newDatalogFile{3};
 % Copy newly created file to local machine
 % Collect all output files in output folder; save most recent file separately
 disp("Gathering file " + newDatalogFile)
-shellCommand = sprintf("scp pi@192.168.1.201:/home/pi/cpdrillsensor/output/%s output/%s", newDatalogFile, newDatalogFile);
+shellCommand = sprintf("scp pi@192.168.1.201:/home/pi/cpdrillsensor/output/%s ../output/%s", newDatalogFile, newDatalogFile);
 [~, cmdout] = system(shellCommand);
-copyfile("output/" + newDatalogFile, "output/datalog_current.csv")
+copyfile("../output/" + newDatalogFile, "datalog_current.csv")
