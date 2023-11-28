@@ -6,11 +6,11 @@ plot(data_raw, "time", {'aquisitionDuration', 'remainingTime'})
 title("aquisitionDuration, remainingTime")
 
 figure()
-stackedplot(data_raw,["imu1_accX","imu1_accY","imu1_accZ"],"XVariable","time")
+stackedplot(data_raw,["acc1X","acc1Y","acc1Z"],"XVariable","time")
 title("Acceleration data IMU1")
 
 figure()
-stackedplot(data_raw,["imu2_accX","imu2_accY","imu2_accZ"],"XVariable","time")
+stackedplot(data_raw,["acc2X","acc2Y","acc2Z"],"XVariable","time")
 title("Acceleration data IMU2")
 
 figure()
@@ -18,10 +18,6 @@ stackedplot(data_raw,["temp0","temp1", "temp2", "temp3"],"XVariable","time")
 title("Temperature")
 
 figure()
-stackedplot(data_raw,["power1Volt","power1MilliAmp","power1MilliWatt","power1ShuntMilliVolt"],"XVariable","time")
-title("Power Meter 1")
-
-figure()
-stackedplot(data_raw,["power2Volt","power2MilliAmp","power2MilliWatt","power2ShuntMilliVolt"],"XVariable","time")
-title("Power Meter 2")
+stackedplot(data_raw,["power1MilliWatt","power2MilliWatt"],"XVariable","time")
+title("Power Meter")
 

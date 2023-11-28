@@ -6,13 +6,19 @@
             "request": "launch",
             "script": "${workspaceFolder}/deploy_logger.ps1",
             "cwd": "${cwd}"
-        },
-        {
-            "name": "Cleanup",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${workspaceFolder}/cleanup.ps1",
-            "cwd": "${cwd}"
-        }
-    ]
+        },{
+        "name": "DeployRunRetrieve",
+        "type": "PowerShell",
+        "request": "launch",
+        "script": "${workspaceFolder}/deploy_run_retrieve.ps1",
+        "cwd": "${cwd}"
+    },
+    {
+        "name": "Cleanup",
+        "type": "PowerShell",
+        "request": "launch",
+        "script": "${workspaceFolder}/cleanup.ps1",
+        "cwd": "${cwd}"
+    }
+]
 }

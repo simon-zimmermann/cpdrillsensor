@@ -1,18 +1,16 @@
-"""
-Python module for LSM6DS3 IMU made by STMicroelectronics
-
-Programmed by William Harrington wrh2.github.io https://github.com/wrh2/LSM6DS3
-
-Modified by Simon Zimmermann
-
-"""
 import smbus2
 from ctypes import c_int16
 
-bus = smbus2.SMBus(1)
 
+class Sensor_accel_module:
+    """
+    Python module for LSM6DS3 IMU made by STMicroelectronics
 
-class LSM6DS3:
+    Programmed by William Harrington wrh2.github.io https://github.com/wrh2/LSM6DS3
+
+    Modified by Simon Zimmermann
+
+    """
     LSM6DS3_WHO_AM_I = 0x69
 
     ACC_ODR_POWER_DOWN = 0
@@ -70,6 +68,8 @@ class LSM6DS3:
     GYRO_SCALE_500DPS = 1
     GYRO_SCALE_1000DPS = 2
     GYRO_SCALE_2000DPS = 3
+
+    bus = smbus2.SMBus(1)
 
     def __init__(self,
                  ACC_ODR=ACC_ODR_POWER_DOWN,
@@ -351,18 +351,18 @@ class LSM6DS3:
     def __read_reg(self, reg, b=1):
         try:
             if b == 1:
-                return bus.read_byte_data(self.DEVICE_ADDRESS, reg)
+                return self.bus.read_byte_data(self.DEVICE_ADDRESS, reg)
             else:
-                return bus.read_i2c_block_data(self.DEVICE_ADDRESS, reg, b)
+                return self.bus.read_i2c_block_data(self.DEVICE_ADDRESS, reg, b)
         except Exception as e:
             print('Caught exception %s' % e)
 
     def __write_reg(self, reg, data, b=1):
         try:
             if b == 1:
-                bus.write_byte_data(self.DEVICE_ADDRESS, reg, data)
+                self.bus.write_byte_data(self.DEVICE_ADDRESS, reg, data)
             else:
-                return bus.write_i2c_block_data(self.DEVICE_ADDRESS, reg, data)
+                return self.bus.write_i2c_block_data(self.DEVICE_ADDRESS, reg, data)
         except Exception as e:
             print('Caught exception %s' % e)
 
@@ -697,3 +697,35 @@ class LSM6DS3:
         acc_data = self.getAccData()
         gyro_data = self.getGyroData()
         return acc_data + gyro_data
+
+
+class Sensor_accel:
+    def __init__(self):
+        self.ACC_rate = Sensor_accel_module.ACC_ODR_52_HZ
+        self.ACC_scale = Sensor_accel_module.ACC_SCALE_16G
+        self.sensor1 = Sensor_accel_module(ACC_ODR=self.ACC_rate,
+                                           GYRO_ODR=Sensor_accel_module.GYRO_ODR_POWER_DOWN,
+                                           enable_acc=Sensor_accel_module.ENABLE_ACC_ALL_AXIS,
+                                           enable_gyro=Sensor_accel_module.ENABLE_GYRO_NONE_AXIS,
+                                           acc_interrupt=False,
+                                           acc_scale=self.ACC_scale,
+                                           pin_SAD_level=0)
+
+        self.sensor2 = Sensor_accel_module(ACC_ODR=self.ACC_rate,
+                                           GYRO_ODR=Sensor_accel_module.GYRO_ODR_POWER_DOWN,
+                                           enable_acc=Sensor_accel_module.ENABLE_ACC_ALL_AXIS,
+                                           enable_gyro=Sensor_accel_module.ENABLE_GYRO_NONE_AXIS,
+                                           acc_interrupt=False,
+                                           acc_scale=self.ACC_scale,
+                                           pin_SAD_level=1)
+
+    def get_csv_header(self):
+        return "acc1X, acc1Y, acc1Z, acc2X, acc2Y, acc2Z"
+
+    def get_data(self):
+        accData1 = self.sensor1.getAccData()
+        accData2 = self.sensor2.getAccData()
+        accString = "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f" % \
+            (accData1[0], accData1[1], accData1[2],
+             accData2[0], accData2[1], accData2[2])
+        return accString
