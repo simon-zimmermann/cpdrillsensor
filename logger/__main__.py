@@ -39,11 +39,12 @@ def main():
     # determine filename before waiting for trigger to make analysis of stout easier
     filename = "sensorlog_" + time.strftime("%Y-%m-%d_%H-%M-%S") + ".csv"
     print("logging to file:\n" + filename)
+    sys.stdout.flush()  # regular flushing required to see output in matlab
 
     # wait for trigger if requested
     if (waitTrigger):
         print("Waiting for trigger condition")
-        sys.stdout.flush()
+        sys.stdout.flush()  # regular flushing required to see output in matlab
         while (not power.is_triggered()):
             time.sleep(1)
         print("Trigger condition met")
@@ -54,6 +55,7 @@ def main():
             (accelerator.get_csv_header(),
              ntc.get_csv_header(),
              power.get_csv_header()))
+    sys.stdout.flush()  # regular flushing required to see output in matlab
 
     # the second the file was created
     time_absolute_start = time.time()
@@ -93,6 +95,7 @@ def main():
             logCount = logCount + 1
             if (logCount % (logFrequency * 2) == 0):
                 print("logging: entry #%d at t=%fs" % (logCount, time_since_start))
+                sys.stdout.flush()  # regular flushing required to see output in matlab
 
             # actual loop timing function
             timer.checkpt()
