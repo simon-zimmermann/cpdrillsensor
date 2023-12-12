@@ -1,9 +1,9 @@
 close all
 data_raw = readtable("datalog_current.csv");
  
-figure()
-plot(data_raw, "time", {'aquisitionDuration', 'remainingTime'})
-title("aquisitionDuration, remainingTime")
+%figure()
+%plot(data_raw, "time", {'aquisitionDuration', 'remainingTime'})
+%title("aquisitionDuration, remainingTime")
 
 figure()
 s = stackedplot(data_raw,["acc1X","acc1Y","acc1Z"],"XVariable","time");
